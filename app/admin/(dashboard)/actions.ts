@@ -108,7 +108,8 @@ export async function deleteMessage(id: string) {
 // Programs
 // ---------------------------------------------------------------------------
 export async function setProgramStatus(id: string, status: "draft" | "published" | "archived") {
-  return updateRow("programs", id, { status }, "/admin/programs")
+  const isPublished = status === "published"
+  return updateRow("programs", id, { is_published: isPublished }, "/admin/programs")
 }
 export async function deleteProgram(id: string) {
   return deleteRow("programs", id, "/admin/programs")
@@ -118,6 +119,14 @@ export async function createProgram(formData: FormData) {
   const slug =
     String(formData.get("slug") ?? "").trim() ||
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+  
+  // Parse outcomes if provided
+  let outcomes = []
+  try {
+    const outcomesStr = String(formData.get("outcomes") ?? "")
+    if (outcomesStr) outcomes = JSON.parse(outcomesStr)
+  } catch {}
+  
   return insertRow(
     "programs",
     {
@@ -130,7 +139,11 @@ export async function createProgram(formData: FormData) {
       duration: String(formData.get("duration") ?? ""),
       fees_ksh: Number(formData.get("fees_ksh") ?? 0),
       summary: String(formData.get("summary") ?? ""),
-      status: String(formData.get("status") ?? "draft"),
+      description: String(formData.get("description") ?? ""),
+      outcomes,
+      thumbnail_url: String(formData.get("thumbnail_url") ?? ""),
+      featured: String(formData.get("featured") ?? "false") === "true",
+      is_published: false,
     },
     "/admin/programs",
   )

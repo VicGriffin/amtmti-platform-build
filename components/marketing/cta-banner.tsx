@@ -19,20 +19,22 @@ export function CtaBanner() {
               today.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90">
-                <Link href="/register">
-                  Enroll Now
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
               <Button
-                asChild
+                size="lg"
+                className="bg-gold text-gold-foreground hover:bg-gold/90"
+                render={
+                  <Link href="/register">
+                    Enroll Now
+                    <ArrowRight className="size-4" />
+                  </Link>
+                }
+              />
+              <Button
                 size="lg"
                 variant="outline"
                 className="border-secondary-foreground/30 bg-transparent text-secondary-foreground hover:bg-secondary-foreground/10 hover:text-secondary-foreground"
-              >
-                <Link href="/programs">Browse Programs</Link>
-              </Button>
+                render={<Link href="/programs">Browse Programs</Link>}
+              />
             </div>
           </div>
         </div>

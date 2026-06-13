@@ -102,11 +102,16 @@ function ProgramsMega({ onNavigate }: { onNavigate?: () => void }) {
             </li>
           ))}
         </ul>
-        <Button asChild variant="secondary" size="sm" className="mt-5 w-full">
-          <Link href="/programs" onClick={onNavigate}>
-            Browse all programs
-          </Link>
-        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="mt-5 w-full"
+          render={
+            <Link href="/programs" onClick={onNavigate}>
+              Browse all programs
+            </Link>
+          }
+        />
       </div>
     </div>
   )
@@ -192,22 +197,20 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle className="hidden sm:inline-flex" />
-            <Button asChild className="hidden bg-gold text-gold-foreground hover:bg-gold/90 md:inline-flex">
-              <Link href="/register">Enroll Now</Link>
-            </Button>
+            <Button className="hidden bg-gold text-gold-foreground hover:bg-gold/90 md:inline-flex" render={<Link href="/register">Enroll Now</Link>} />
 
             {/* Mobile */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="xl:hidden" aria-label="Open menu">
-                  <Menu className="size-5" />
-                </Button>
+              <SheetTrigger
+                render={
+                  <Button variant="outline" size="icon" className="xl:hidden" aria-label="Open menu" />
+                }
+              >
+                <Menu className="size-5" />
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] overflow-y-auto p-0">
                 <SheetHeader className="border-b p-5">
-                  <SheetTitle asChild>
-                    <Logo />
-                  </SheetTitle>
+                  <SheetTitle render={<Logo />} />
                 </SheetHeader>
                 <nav className="flex flex-col gap-1 p-4">
                   {MAIN_NAV.map((item) => (
@@ -227,21 +230,30 @@ export function SiteHeader() {
                   ))}
                 </nav>
                 <div className="flex flex-col gap-2 border-t p-4">
-                  <Button asChild className="bg-gold text-gold-foreground hover:bg-gold/90">
-                    <Link href="/register" onClick={() => setMobileOpen(false)}>
-                      Enroll Now
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link href="/login" onClick={() => setMobileOpen(false)}>
-                      Student Login
-                    </Link>
-                  </Button>
-                  <Button asChild variant="ghost">
-                    <Link href="/admin/login" onClick={() => setMobileOpen(false)}>
-                      Admin Login
-                    </Link>
-                  </Button>
+                  <Button
+                    className="bg-gold text-gold-foreground hover:bg-gold/90"
+                    render={
+                      <Link href="/register" onClick={() => setMobileOpen(false)}>
+                        Enroll Now
+                      </Link>
+                    }
+                  />
+                  <Button
+                    variant="outline"
+                    render={
+                      <Link href="/login" onClick={() => setMobileOpen(false)}>
+                        Student Login
+                      </Link>
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    render={
+                      <Link href="/admin/login" onClick={() => setMobileOpen(false)}>
+                        Admin Login
+                      </Link>
+                    }
+                  />
                   <div className="flex items-center justify-between pt-2 text-sm">
                     <span className="text-muted-foreground">Theme</span>
                     <ThemeToggle />

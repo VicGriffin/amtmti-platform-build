@@ -1,6 +1,7 @@
-import { getAdminDb } from "@/lib/admin-data"
+import { requireAdmin } from "@/lib/admin-data"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { createNews, setNewsPublished, deleteNews } from "@/app/admin/(dashboard)/actions"
-import { AdminPageHeader, DbNotConnected, EmptyState } from "@/components/admin/admin-ui"
+import { AdminPageHeader, EmptyState } from "@/components/admin/admin-ui"
 import { RowActions } from "@/components/admin/row-actions"
 import { CreateDialog, type Field } from "@/components/admin/create-dialog"
 import { Badge } from "@/components/ui/badge"
@@ -23,24 +24,27 @@ const fields: Field[] = [
   },
   { name: "excerpt", label: "Excerpt", type: "textarea" },
   { name: "body", label: "Body", type: "textarea" },
-  { name: "published", label: "Publish immediately", type: "checkbox", defaultValue: "1" },
+  { name: "author", label: "Author", placeholder: "AMTMTI Communications" },
+  { name: "read_minutes", label: "Read time (minutes)", type: "number", defaultValue: 3 },
+  {
+    name: "featured",
+    label: "Featured",
+    type: "select",
+    defaultValue: "false",
+    options: [
+      { value: "true", label: "Yes" },
+      { value: "false", label: "No" },
+    ],
+  },
 ]
 
 export default async function AdminNewsPage() {
-  const db = getAdminDb()
-
-  if (!db) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <AdminPageHeader title="News" description="Manage news articles and announcements." />
-        <DbNotConnected />
-      </div>
-    )
-  }
+  await requireAdmin()
+  const db = createAdminClient()
 
   const { data: news } = await db
     .from("news")
-    .select("id, title, category, published, published_at")
+    .select("id, title, category, is_published, published_at")
     .order("published_at", { ascending: false })
   const list = news ?? []
 
@@ -79,18 +83,18 @@ export default async function AdminNewsPage() {
                   <TableCell className="font-medium text-foreground">{n.title}</TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">{n.category || "—"}</TableCell>
                   <TableCell>
-                    <Badge variant={n.published ? "default" : "secondary"}>
-                      {n.published ? "Published" : "Draft"}
+                    <Badge variant={n.is_published ? "default" : "secondary"}>
+                      {n.is_published ? "Published" : "Draft"}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <RowActions
                       actions={[
                         {
-                          label: n.published ? "Unpublish" : "Publish",
+                          label: n.is_published ? "Unpublish" : "Publish",
                           run: async () => {
                             "use server"
-                            return setNewsPublished(n.id, !n.published)
+                            return setNewsPublished(n.id, !n.is_published)
                           },
                           successMessage: "Status updated.",
                         },

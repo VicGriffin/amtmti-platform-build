@@ -1,0 +1,39 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { validateAdminCredentials, createAdminSession } from '@/lib/admin-auth'
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { email, password } = body
+
+    // Validate input
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate credentials
+    if (!validateAdminCredentials(email, password)) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
+    }
+
+    // Create session
+    await createAdminSession()
+
+    return NextResponse.json(
+      { success: true, message: 'Login successful' },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('[api/admin/login] Error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}

@@ -1,16 +1,29 @@
-import { getAdminDb } from "@/lib/admin-data"
+import { requireAdmin } from "@/lib/admin-data"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { createEvent, deleteEvent } from "@/app/admin/(dashboard)/actions"
-import { AdminPageHeader, DbNotConnected, EmptyState } from "@/components/admin/admin-ui"
+import { AdminPageHeader, EmptyState } from "@/components/admin/admin-ui"
 import { RowActions } from "@/components/admin/row-actions"
 import { CreateDialog, type Field } from "@/components/admin/create-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const fields: Field[] = [
   { name: "title", label: "Title", required: true },
+  { name: "slug", label: "Slug (optional)", placeholder: "auto-generated from title" },
   { name: "description", label: "Description", type: "textarea" },
   { name: "location", label: "Location", placeholder: "Nairobi, Kenya / Online" },
-  { name: "starts_at", label: "Starts at", type: "datetime-local" },
-  { name: "speakers", label: "Speakers (comma separated)", placeholder: "Dr. A, Prof. B" },
+  {
+    name: "mode",
+    label: "Mode",
+    type: "select",
+    options: [
+      { value: "In-Person", label: "In-Person" },
+      { value: "Virtual", label: "Virtual" },
+      { value: "Hybrid", label: "Hybrid" },
+    ],
+  },
+  { name: "date", label: "Date", type: "datetime-local" },
+  { name: "image_url", label: "Image URL", placeholder: "https://..." },
+  { name: "registration_url", label: "Registration URL", placeholder: "https://..." },
 ]
 
 function formatDate(value: string | null) {
@@ -22,21 +35,13 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminEventsPage() {
-  const db = getAdminDb()
-
-  if (!db) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <AdminPageHeader title="Events" description="Manage upcoming events." />
-        <DbNotConnected />
-      </div>
-    )
-  }
+  await requireAdmin()
+  const db = createAdminClient()
 
   const { data: events } = await db
     .from("events")
-    .select("id, title, location, starts_at, speakers")
-    .order("starts_at", { ascending: true })
+    .select("id, title, location, date, mode")
+    .order("date", { ascending: true })
   const list = events ?? []
 
   return (
@@ -72,8 +77,10 @@ export default async function AdminEventsPage() {
               {list.map((e) => (
                 <TableRow key={e.id}>
                   <TableCell className="font-medium text-foreground">{e.title}</TableCell>
-                  <TableCell className="hidden text-muted-foreground md:table-cell">{e.location || "—"}</TableCell>
-                  <TableCell className="text-muted-foreground">{formatDate(e.starts_at)}</TableCell>
+                  <TableCell className="hidden text-muted-foreground md:table-cell">
+                    {e.location || "—"} ({e.mode})
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">{formatDate(e.date)}</TableCell>
                   <TableCell>
                     <RowActions
                       actions={[

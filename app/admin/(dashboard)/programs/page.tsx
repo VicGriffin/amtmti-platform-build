@@ -7,9 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
-  published: "default",
-  draft: "secondary",
-  archived: "outline",
+  true: "default",
+  false: "secondary",
 }
 
 const fields: Field[] = [
@@ -52,15 +51,17 @@ const fields: Field[] = [
   { name: "duration", label: "Duration", placeholder: "12 weeks" },
   { name: "fees_ksh", label: "Fees (KSH)", type: "number", defaultValue: 0 },
   { name: "summary", label: "Summary", type: "textarea" },
+  { name: "description", label: "Description", type: "textarea" },
+  { name: "outcomes", label: "Learning outcomes (JSON array)", type: "textarea", placeholder: "[\"Outcome 1\", \"Outcome 2\"]" },
+  { name: "thumbnail_url", label: "Thumbnail URL", placeholder: "https://..." },
   {
-    name: "status",
-    label: "Status",
+    name: "featured",
+    label: "Featured",
     type: "select",
-    defaultValue: "draft",
+    defaultValue: "false",
     options: [
-      { value: "draft", label: "Draft" },
-      { value: "published", label: "Published" },
-      { value: "archived", label: "Archived" },
+      { value: "true", label: "Yes" },
+      { value: "false", label: "No" },
     ],
   },
 ]
@@ -79,7 +80,7 @@ export default async function AdminProgramsPage() {
 
   const { data: programs } = await db
     .from("programs")
-    .select("id, title, category_label, level, mode, fees_ksh, status")
+    .select("id, title, category_label, level, mode, fees_ksh, is_published")
     .order("created_at", { ascending: false })
   const list = programs ?? []
 
@@ -124,37 +125,34 @@ export default async function AdminProgramsPage() {
                     {p.fees_ksh ? `KSH ${p.fees_ksh.toLocaleString()}` : "Free"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={statusVariant[p.status] ?? "outline"} className="capitalize">
-                      {p.status}
+                    <Badge variant={statusVariant[String(p.is_published)] ?? "outline"}>
+                      {p.is_published ? "Published" : "Draft"}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <RowActions
                       actions={[
-                        {
-                          label: "Publish",
-                          run: async () => {
-                            "use server"
-                            return setProgramStatus(p.id, "published")
-                          },
-                          successMessage: "Program published.",
-                        },
-                        {
-                          label: "Set draft",
-                          run: async () => {
-                            "use server"
-                            return setProgramStatus(p.id, "draft")
-                          },
-                          successMessage: "Set to draft.",
-                        },
-                        {
-                          label: "Archive",
-                          run: async () => {
-                            "use server"
-                            return setProgramStatus(p.id, "archived")
-                          },
-                          successMessage: "Program archived.",
-                        },
+                        ...(p.is_published
+                          ? [
+                              {
+                                label: "Unpublish",
+                                run: async () => {
+                                  "use server"
+                                  return setProgramStatus(p.id, "draft")
+                                },
+                                successMessage: "Program unpublished.",
+                              },
+                            ]
+                          : [
+                              {
+                                label: "Publish",
+                                run: async () => {
+                                  "use server"
+                                  return setProgramStatus(p.id, "published")
+                                },
+                                successMessage: "Program published.",
+                              },
+                            ]),
                         {
                           label: "Delete",
                           destructive: true,

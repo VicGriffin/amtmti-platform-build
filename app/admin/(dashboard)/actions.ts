@@ -108,7 +108,8 @@ export async function deleteMessage(id: string) {
 // Programs
 // ---------------------------------------------------------------------------
 export async function setProgramStatus(id: string, status: "draft" | "published" | "archived") {
-  return updateRow("programs", id, { status }, "/admin/programs")
+  const isPublished = status === "published"
+  return updateRow("programs", id, { is_published: isPublished }, "/admin/programs")
 }
 export async function deleteProgram(id: string) {
   return deleteRow("programs", id, "/admin/programs")
@@ -118,6 +119,14 @@ export async function createProgram(formData: FormData) {
   const slug =
     String(formData.get("slug") ?? "").trim() ||
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+  
+  // Parse outcomes if provided
+  let outcomes = []
+  try {
+    const outcomesStr = String(formData.get("outcomes") ?? "")
+    if (outcomesStr) outcomes = JSON.parse(outcomesStr)
+  } catch {}
+  
   return insertRow(
     "programs",
     {
@@ -130,7 +139,11 @@ export async function createProgram(formData: FormData) {
       duration: String(formData.get("duration") ?? ""),
       fees_ksh: Number(formData.get("fees_ksh") ?? 0),
       summary: String(formData.get("summary") ?? ""),
-      status: String(formData.get("status") ?? "draft"),
+      description: String(formData.get("description") ?? ""),
+      outcomes,
+      thumbnail_url: String(formData.get("thumbnail_url") ?? ""),
+      featured: String(formData.get("featured") ?? "false") === "true",
+      is_published: false,
     },
     "/admin/programs",
   )
@@ -143,7 +156,7 @@ export async function deleteNews(id: string) {
   return deleteRow("news", id, "/admin/news")
 }
 export async function setNewsPublished(id: string, published: boolean) {
-  return updateRow("news", id, { published }, "/admin/news")
+  return updateRow("news", id, { is_published: published }, "/admin/news")
 }
 export async function createNews(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim()
@@ -158,7 +171,10 @@ export async function createNews(formData: FormData) {
       excerpt: String(formData.get("excerpt") ?? ""),
       body: String(formData.get("body") ?? ""),
       category: String(formData.get("category") ?? "News"),
-      published: formData.get("published") === "on",
+      author: String(formData.get("author") ?? "AMTMTI Communications"),
+      read_minutes: Number(formData.get("read_minutes") ?? 3),
+      featured: String(formData.get("featured") ?? "false") === "true",
+      is_published: false,
     },
     "/admin/news",
   )
@@ -171,18 +187,23 @@ export async function deleteEvent(id: string) {
   return deleteRow("events", id, "/admin/events")
 }
 export async function createEvent(formData: FormData) {
-  const startsAt = String(formData.get("starts_at") ?? "")
+  const title = String(formData.get("title") ?? "").trim()
+  const slug =
+    String(formData.get("slug") ?? "").trim() ||
+    title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+  const date = String(formData.get("date") ?? "")
   return insertRow(
     "events",
     {
-      title: String(formData.get("title") ?? "").trim(),
+      title,
+      slug,
       description: String(formData.get("description") ?? ""),
       location: String(formData.get("location") ?? ""),
-      starts_at: startsAt ? new Date(startsAt).toISOString() : null,
-      speakers: String(formData.get("speakers") ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
+      mode: String(formData.get("mode") ?? "Hybrid"),
+      date: date ? new Date(date).toISOString() : null,
+      image_url: String(formData.get("image_url") ?? ""),
+      registration_url: String(formData.get("registration_url") ?? ""),
+      is_published: true,
     },
     "/admin/events",
   )

@@ -1,6 +1,7 @@
-import { getAdminDb } from "@/lib/admin-data"
+import { requireAdmin } from "@/lib/admin-data"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { setApplicationStatus } from "@/app/admin/(dashboard)/actions"
-import { AdminPageHeader, DbNotConnected, EmptyState } from "@/components/admin/admin-ui"
+import { AdminPageHeader, EmptyState } from "@/components/admin/admin-ui"
 import { RowActions } from "@/components/admin/row-actions"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -12,20 +13,12 @@ const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
 }
 
 export default async function AdminApplicationsPage() {
-  const db = getAdminDb()
-
-  if (!db) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <AdminPageHeader title="Membership Applications" description="Review and process membership applications." />
-        <DbNotConnected />
-      </div>
-    )
-  }
+  await requireAdmin()
+  const db = createAdminClient()
 
   const { data: apps } = await db
     .from("membership_applications")
-    .select("id, name, email, country, profession, tier, status, created_at")
+    .select("id, full_name, email, country, profession, membership_tier, status, created_at")
     .order("created_at", { ascending: false })
   const list = apps ?? []
 
@@ -51,11 +44,11 @@ export default async function AdminApplicationsPage() {
               {list.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell>
-                    <span className="block font-medium text-foreground">{a.name}</span>
+                    <span className="block font-medium text-foreground">{a.full_name}</span>
                     <span className="block text-xs text-muted-foreground">{a.email}</span>
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">{a.profession || "—"}</TableCell>
-                  <TableCell className="capitalize text-muted-foreground">{a.tier}</TableCell>
+                  <TableCell className="capitalize text-muted-foreground">{a.membership_tier}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariant[a.status] ?? "outline"} className="capitalize">
                       {a.status}

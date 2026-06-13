@@ -1,6 +1,7 @@
-import { getAdminDb } from "@/lib/admin-data"
+import { requireAdmin } from "@/lib/admin-data"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { setEnrollmentStatus } from "@/app/admin/(dashboard)/actions"
-import { AdminPageHeader, DbNotConnected, EmptyState } from "@/components/admin/admin-ui"
+import { AdminPageHeader, EmptyState } from "@/components/admin/admin-ui"
 import { RowActions } from "@/components/admin/row-actions"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -10,25 +11,17 @@ const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
   active: "default",
   completed: "secondary",
   pending: "outline",
-  rejected: "outline",
+  cancelled: "outline",
 }
 
 export default async function AdminEnrollmentsPage() {
-  const db = getAdminDb()
-
-  if (!db) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <AdminPageHeader title="Enrollments" description="Approve, reject, and track program enrollments." />
-        <DbNotConnected />
-      </div>
-    )
-  }
+  await requireAdmin()
+  const db = createAdminClient()
 
   const { data: enrollments } = await db
     .from("enrollments")
-    .select("id, program_title, category_label, level, status, progress, created_at")
-    .order("created_at", { ascending: false })
+    .select("id, status, progress_percentage, enrolled_at, programs(title)")
+    .order("enrolled_at", { ascending: false })
   const list = enrollments ?? []
 
   return (
@@ -43,7 +36,6 @@ export default async function AdminEnrollmentsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Program</TableHead>
-                <TableHead className="hidden md:table-cell">Category</TableHead>
                 <TableHead className="hidden lg:table-cell">Progress</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-12" />
@@ -52,12 +44,13 @@ export default async function AdminEnrollmentsPage() {
             <TableBody>
               {list.map((e) => (
                 <TableRow key={e.id}>
-                  <TableCell className="font-medium text-foreground">{e.program_title}</TableCell>
-                  <TableCell className="hidden text-muted-foreground md:table-cell">{e.category_label || "—"}</TableCell>
+                  <TableCell className="font-medium text-foreground">
+                    {(e.programs as any)?.title || "Unknown"}
+                  </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="flex items-center gap-2">
-                      <Progress value={e.progress} className="h-2 w-24" />
-                      <span className="text-xs text-muted-foreground">{e.progress}%</span>
+                      <Progress value={e.progress_percentage || 0} className="h-2 w-24" />
+                      <span className="text-xs text-muted-foreground">{e.progress_percentage || 0}%</span>
                     </div>
                   </TableCell>
                   <TableCell>

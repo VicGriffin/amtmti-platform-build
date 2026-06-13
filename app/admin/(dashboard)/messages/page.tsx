@@ -1,6 +1,7 @@
-import { getAdminDb } from "@/lib/admin-data"
+import { requireAdmin } from "@/lib/admin-data"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { setMessageStatus, deleteMessage } from "@/app/admin/(dashboard)/actions"
-import { AdminPageHeader, DbNotConnected, EmptyState } from "@/components/admin/admin-ui"
+import { AdminPageHeader, EmptyState } from "@/components/admin/admin-ui"
 import { RowActions } from "@/components/admin/row-actions"
 import { Badge } from "@/components/ui/badge"
 
@@ -11,20 +12,12 @@ const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
 }
 
 export default async function AdminMessagesPage() {
-  const db = getAdminDb()
-
-  if (!db) {
-    return (
-      <div className="mx-auto max-w-5xl">
-        <AdminPageHeader title="Messages" description="Inbox of contact form submissions." />
-        <DbNotConnected />
-      </div>
-    )
-  }
+  await requireAdmin()
+  const db = createAdminClient()
 
   const { data: messages } = await db
     .from("contact_messages")
-    .select("id, name, email, subject, inquiry_type, message, status, created_at")
+    .select("id, name, email, inquiry_type, message, status, created_at")
     .order("created_at", { ascending: false })
   const list = messages ?? []
 

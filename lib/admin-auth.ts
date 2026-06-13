@@ -22,7 +22,7 @@ export function validateAdminCredentials(email: string, password: string) {
 
 export async function createAdminSession() {
   const store = await cookies()
-  store.set(ADMIN_COOKIE_NAME, makeAdminToken(), {
+  store.set(ADMIN_COOKIE_NAME, await makeAdminToken(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

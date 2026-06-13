@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { verifyAdminToken } from '@/lib/admin-token'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -48,15 +49,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Protect the admin area (but allow the admin login page itself)
-  if (
-    pathname.startsWith('/admin') &&
-    pathname !== '/admin/login' &&
-    !user
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/admin/login'
-    return NextResponse.redirect(url)
+  // Protect the admin area (but allow the admin login page itself).
+  // Admins authenticate via a separate signed cookie, not Supabase Auth.
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const token = request.cookies.get('amtmti_admin')?.value
+    if (!verifyAdminToken(token)) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

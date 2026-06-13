@@ -19,14 +19,14 @@ export default async function PortalDashboard() {
   const [{ data: enrollments }, { count: certCount }, { data: notifications }] = await Promise.all([
     supabase
       .from("enrollments")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
-    supabase.from("certificates").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+      .select("*, programs(id, title, thumbnail_url)")
+      .eq("student_id", user.id)
+      .order("enrolled_at", { ascending: false }),
+    supabase.from("certificates").select("*", { count: "exact", head: true }).eq("student_id", user.id),
     supabase
       .from("notifications")
       .select("*")
-      .or(`user_id.eq.${user.id},user_id.is.null`)
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(4),
   ])
@@ -73,25 +73,27 @@ export default async function PortalDashboard() {
                 </Button>
               </div>
             ) : (
-              list.slice(0, 4).map((e) => (
-                <div key={e.id} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-foreground">{e.program_title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {e.category_label} {e.level ? `· ${e.level}` : ""}
-                      </p>
+              list.slice(0, 4).map((e) => {
+                const program = (e.programs as any)
+                return (
+                  <div key={e.id} className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">
+                          {program?.title || "Unknown Program"}
+                        </p>
+                      </div>
+                      <Badge variant={statusVariant[e.status] ?? "outline"} className="capitalize">
+                        {e.status}
+                      </Badge>
                     </div>
-                    <Badge variant={statusVariant[e.status] ?? "outline"} className="capitalize">
-                      {e.status}
-                    </Badge>
+                    <div className="mt-3 flex items-center gap-3">
+                      <Progress value={e.progress_percentage || 0} className="h-2" />
+                      <span className="text-xs font-medium text-muted-foreground">{e.progress_percentage || 0}%</span>
+                    </div>
                   </div>
-                  <div className="mt-3 flex items-center gap-3">
-                    <Progress value={e.progress} className="h-2" />
-                    <span className="text-xs font-medium text-muted-foreground">{e.progress}%</span>
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </section>
@@ -110,8 +112,8 @@ export default async function PortalDashboard() {
               (notifications ?? []).map((n) => (
                 <div key={n.id} className="rounded-xl border border-border bg-card p-4">
                   <p className="text-sm font-medium text-foreground text-pretty">{n.title}</p>
-                  {n.body ? (
-                    <p className="mt-1 text-xs text-muted-foreground text-pretty">{n.body}</p>
+                  {n.message ? (
+                    <p className="mt-1 text-xs text-muted-foreground text-pretty">{n.message}</p>
                   ) : null}
                   <p className="mt-2 text-xs text-muted-foreground">
                     {new Date(n.created_at).toLocaleDateString()}

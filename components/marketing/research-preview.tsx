@@ -22,6 +22,14 @@ const icons: Record<string, LucideIcon> = {
   CheckCircle2,
 }
 
+const researchImages: Record<string, string> = {
+  'Medication Safety': '/images/medication_safety.png',
+  'Clinical Pharmacy': '/images/clinical_pharmacy.png',
+  'Pharmaceutical Care': '/images/Pharmaceutical_care.png',
+  'Public Health': '/images/Public_health.png',
+  'Medication Adherence': '/images/medical_adherence.png',
+}
+
 export function ResearchPreview() {
   return (
     <section className="relative overflow-hidden bg-primary py-20 text-primary-foreground">
@@ -45,7 +53,7 @@ export function ResearchPreview() {
               {RESEARCH_STATS.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl bg-primary-foreground/5 p-4 ring-1 ring-primary-foreground/10"
+                  className="bg-primary-foreground/5 p-4 ring-1 ring-primary-foreground/10"
                 >
                   <dt className="font-heading text-3xl font-bold text-gold">
                     {stat.value}
@@ -68,6 +76,7 @@ export function ResearchPreview() {
           <div className="grid gap-3 sm:grid-cols-2">
             {RESEARCH_AREAS.map((area, i) => {
               const Icon = icons[area.icon]
+              const bgImage = researchImages[area.title]
               return (
                 <motion.div
                   key={area.title}
@@ -75,17 +84,25 @@ export function ResearchPreview() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="rounded-2xl bg-primary-foreground/5 p-5 ring-1 ring-primary-foreground/10 transition hover:bg-primary-foreground/10"
+                  className="relative overflow-hidden p-5 ring-1 ring-primary-foreground/10 transition hover:ring-primary-foreground/20"
+                  style={{
+                    backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
                 >
-                  <span className="flex size-10 items-center justify-center rounded-lg bg-gold/20 text-gold">
-                    <Icon className="size-5" />
-                  </span>
-                  <h3 className="mt-3 font-heading text-base font-semibold">
-                    {area.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-primary-foreground/70">
-                    {area.description}
-                  </p>
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="relative z-10">
+                    <span className="flex size-10 items-center justify-center bg-gold/20 text-gold">
+                      <Icon className="size-5" />
+                    </span>
+                    <h3 className="mt-3 font-heading text-base font-semibold text-primary-foreground">
+                      {area.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-primary-foreground/90">
+                      {area.description}
+                    </p>
+                  </div>
                 </motion.div>
               )
             })}

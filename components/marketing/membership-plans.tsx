@@ -12,7 +12,7 @@ export function MembershipPlans({ compact = false }: { compact?: boolean }) {
           key={tier.name}
           id={tier.name.toLowerCase()}
           className={cn(
-            'relative flex flex-col rounded-2xl border bg-card p-6 transition',
+            'relative flex flex-col border bg-card p-6 transition',
             tier.popular
               ? 'border-secondary shadow-lg ring-1 ring-secondary/30 lg:scale-[1.03]'
               : 'border-border hover:border-primary/40 hover:shadow-md',

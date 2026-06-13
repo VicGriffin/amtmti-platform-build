@@ -31,9 +31,9 @@ export function WhyAmtmti() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group rounded-2xl border border-border bg-card p-6 transition hover:-translate-y-1 hover:border-secondary/40 hover:shadow-lg"
+                className="group border border-border bg-card p-6 transition hover:-translate-y-1 hover:border-secondary/40 hover:shadow-lg"
               >
-                <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-secondary group-hover:text-secondary-foreground">
+                <span className="flex size-12 items-center justify-center bg-primary/10 text-primary transition group-hover:bg-secondary group-hover:text-secondary-foreground">
                   <Icon className="size-6" />
                 </span>
                 <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">

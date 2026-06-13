@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, CalendarDays, MapPin } from 'lucide-react'
 import { NEWS, EVENTS, formatDate } from '@/lib/news-data'
 import { SectionHeading } from '@/components/site/section-heading'
@@ -27,9 +28,17 @@ export function NewsEvents() {
                 <Link
                   key={item.slug}
                   href={`/news/${item.slug}`}
-                  className="group flex flex-col gap-2 rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-5"
+                  className="group flex overflow-hidden border border-border bg-card transition hover:border-primary/40 hover:shadow-md sm:flex-row sm:items-center"
                 >
-                  <div className="flex-1">
+                  <div className="relative hidden w-32 shrink-0 sm:block aspect-square">
+                    <Image
+                      src="/images/news_hero1.png"
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-2 p-5">
                     <div className="flex items-center gap-3">
                       <Badge variant="secondary" className="bg-secondary/12 text-secondary">
                         {item.category}
@@ -38,14 +47,14 @@ export function NewsEvents() {
                         {formatDate(item.date)} · {item.readMinutes} min read
                       </span>
                     </div>
-                    <h3 className="mt-2 font-heading text-lg font-semibold leading-snug text-foreground group-hover:text-primary">
+                    <h3 className="font-heading text-lg font-semibold leading-snug text-foreground group-hover:text-primary">
                       {item.title}
                     </h3>
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
                       {item.excerpt}
                     </p>
                   </div>
-                  <ArrowRight className="hidden size-5 shrink-0 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary sm:block" />
+                  <ArrowRight className="hidden size-5 shrink-0 pr-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary lg:block" />
                 </Link>
               ))}
             </div>
@@ -57,21 +66,31 @@ export function NewsEvents() {
               {upcoming.map((event) => (
                 <div
                   key={event.slug}
-                  className="rounded-2xl border border-border bg-card p-5"
+                  className="flex overflow-hidden border border-border bg-card transition hover:border-primary/40 hover:shadow-md"
                 >
-                  <Badge className="bg-gold/20 text-gold-foreground">{event.mode}</Badge>
-                  <h3 className="mt-3 font-heading text-base font-semibold text-foreground">
-                    {event.title}
-                  </h3>
-                  <div className="mt-3 flex flex-col gap-1.5 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-2">
-                      <CalendarDays className="size-4 text-primary" />
-                      {formatDate(event.date)}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <MapPin className="size-4 text-primary" />
-                      {event.location}
-                    </span>
+                  <div className="relative hidden w-24 shrink-0 sm:block aspect-square">
+                    <Image
+                      src="/images/news_hero.png"
+                      alt={event.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 p-5">
+                    <Badge className="bg-gold/20 text-gold-foreground">{event.mode}</Badge>
+                    <h3 className="mt-3 font-heading text-base font-semibold text-foreground">
+                      {event.title}
+                    </h3>
+                    <div className="mt-3 flex flex-col gap-1.5 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-2">
+                        <CalendarDays className="size-4 text-primary" />
+                        {formatDate(event.date)}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <MapPin className="size-4 text-primary" />
+                        {event.location}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

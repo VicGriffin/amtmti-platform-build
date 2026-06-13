@@ -50,7 +50,7 @@ export function ProgramsExplorer({
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
       {/* Filters */}
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <SlidersHorizontal className="size-4 text-primary" />
             <h2 className="font-heading text-sm font-semibold text-foreground">
@@ -142,7 +142,7 @@ export function ProgramsExplorer({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card py-16 text-center">
+          <div className="flex flex-col items-center gap-3 border border-dashed border-border bg-card py-16 text-center">
             <Badge variant="secondary">No matches</Badge>
             <p className="max-w-sm text-sm text-muted-foreground">
               No programs match your current filters. Try clearing some filters or

@@ -12,17 +12,30 @@ const levelColor: Record<Program['level'], string> = {
   'CPD Course': 'bg-accent text-accent-foreground',
 }
 
+const programImages: Record<string, string> = {
+  pharmacists: '/images/MTM_for_Pharmacists.png',
+  clinicians: '/images/MTM_for_Clinicians.png',
+  nurses: '/images/MTM_for_Nurses.png',
+  'pharmaceutical-technicians': '/images/MTM_for_Pharmaceutical Technicians.jpg',
+  'pharmaceutical-technologists': '/images/MTM_for_Pharmaceutical Technologists.png',
+  physicians: '/images/MTM_for_Physicians.png',
+}
+
+function getProgramImage(category: string): string {
+  return programImages[category] || '/images/hero-professionals.png'
+}
+
 export function ProgramCard({ program }: { program: Program }) {
   return (
     <div className="group flex flex-col overflow-hidden border border-border bg-card transition hover:-translate-y-1 hover:shadow-lg">
       <div className="relative aspect-[16/9] overflow-hidden bg-primary">
         <Image
-          src="/images/hero-professionals.png"
+          src={getProgramImage(program.category)}
           alt={program.title}
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30" />
+        <div className="absolute inset-0 bg-black/20" />
         <span className="absolute left-3 top-3 z-10">
           <Badge className={levelColor[program.level]}>{program.level}</Badge>
         </span>

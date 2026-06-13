@@ -27,7 +27,7 @@ export function NewsEvents() {
                 <Link
                   key={item.slug}
                   href={`/news/${item.slug}`}
-                  className="group flex flex-col gap-2 rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-5"
+                  className="group flex flex-col gap-2 border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-5"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export function NewsEvents() {
               {upcoming.map((event) => (
                 <div
                   key={event.slug}
-                  className="rounded-2xl border border-border bg-card p-5"
+                  className="border border-border bg-card p-5"
                 >
                   <Badge className="bg-gold/20 text-gold-foreground">{event.mode}</Badge>
                   <h3 className="mt-3 font-heading text-base font-semibold text-foreground">

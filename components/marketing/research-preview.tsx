@@ -45,7 +45,7 @@ export function ResearchPreview() {
               {RESEARCH_STATS.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl bg-primary-foreground/5 p-4 ring-1 ring-primary-foreground/10"
+                  className="bg-primary-foreground/5 p-4 ring-1 ring-primary-foreground/10"
                 >
                   <dt className="font-heading text-3xl font-bold text-gold">
                     {stat.value}
@@ -75,7 +75,7 @@ export function ResearchPreview() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="rounded-2xl bg-primary-foreground/5 p-5 ring-1 ring-primary-foreground/10 transition hover:bg-primary-foreground/10"
+                  className="bg-primary-foreground/5 p-5 ring-1 ring-primary-foreground/10 transition hover:bg-primary-foreground/10"
                 >
                   <span className="flex size-10 items-center justify-center rounded-lg bg-gold/20 text-gold">
                     <Icon className="size-5" />
